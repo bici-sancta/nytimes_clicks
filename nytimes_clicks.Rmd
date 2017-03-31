@@ -1,0 +1,89 @@
+---
+title: "nytimes_clicks"
+author: "mcdevitt"
+date: "31 mars 2017"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## NYTimes Click Thru Evaluation
+
+
+```{r }
+
+home_dir <- "~/_smu/_src/nytimes_clicks"
+data_dir <- paste0(home_dir, "/data")
+setwd(home_dir)
+
+file_exists <- TRUE
+
+if (file_exists)
+{
+	load("./data/nytc.Rda")	# ...	load the saved data frame ...
+} else {
+	fileLocation <- "http://stat.columbia.edu/~rachel/datasets/nyt1.csv"
+	df_nytc <- read.csv(url(fileLocation))
+	save(df_nytc, file = "./data/nytc.Rda")
+}
+
+# Use the section below if you would rather import the data from a local file
+# fileLocation <- "~/path/for/the/file/nyt1.csv"
+# data1 <- read.csv("fileLocation")
+
+# distribution of the Age column
+hist(data1$Age, main="", xlab="Age")
+
+# distribution of the Clicks column
+hist(data1$Clicks, main="", xlab="# of Clicks")
+
+range(data1$Clicks)
+
+data1$Age_Group <- cut(data1$Age, c(-Inf, 18, 24, 34, 44, 54, 64, Inf))
+
+levels(data1$Age_Group) <- c("<18", "18-24", "25-34", "35-44", "45-54", "55-64", "65+")
+# Name the levels of 'Age_Group' for readability
+
+d1 <- data1[(data1$Impressions > 0),]
+d1$CTR <- d1$Clicks/d1$Impressions
+
+library(ggplot2) # used for visualizations
+ggplot(subset(d1, Impressions>0), aes(x=Impressions, fill=Age_Group))+
+    geom_histogram(binwidth=1)
+
+ggplot(subset(d1, CTR>0), aes(x=CTR, fill=Age_Group))+
+    labs(title="Click-through rate by age group (05/01/2012)")+
+    geom_histogram(binwidth=.025)
+
+#(http://stat.columbia.edu/~rachel/datasets/nyt1.csv)
+#Create a new variable ageGroup that categorizes age into following groups: 
+#< 18, 18–24, 25–34, 35–44, 45–54, 55–64 and 65+.
+
+#Use sub set of data called “ImpSub” where Impressions > 0 ) in your data set.
+
+#Create a new variable called click-through-rate (CTR = click/impression).
+#Use this ImpSub data set to do further analysis.
+
+#Plot distributions of number impressions and click-through-rate (CTR = click/impression) for the age groups.
+
+#Define a new variable to segment users based on click -through-rate (CTR) behavior.
+#    CTR< 0.2, 0.2<=CTR <0.4, 0.4<= CTR<0.6, 0.6<=CTR<0.8, CTR>0.8
+
+#Get the total number of Male, Impressions, Clicks and Signed_In
+#  (0=Female, 1=Male)
+
+# Get the mean of Age, Impressions, Clicks, CTR and percentage of males and signed_In 
+
+#Get the means of Impressions, Clicks, CTR and percentage of males and signed_In  by AgeGroup.
+
+#Create a table of CTRGroup vs AgeGroup counts.
+
+#Plot distributions of number impressions and click-through-rate (CTR = click/impression) for the age groups
+#One more plot you think which is important to look at.
+
+#Submit your file (any format) in to Live session Unit 10 Assignment
+
+
+```
