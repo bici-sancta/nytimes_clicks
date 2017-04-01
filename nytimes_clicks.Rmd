@@ -31,22 +31,22 @@ if (file_exists)
 
 # Use the section below if you would rather import the data from a local file
 # fileLocation <- "~/path/for/the/file/nyt1.csv"
-# data1 <- read.csv("fileLocation")
+# df_nytc <- read.csv("fileLocation")
 
 # distribution of the Age column
-hist(data1$Age, main="", xlab="Age")
+hist(df_nytc$Age, main="", xlab="Age")
 
 # distribution of the Clicks column
-hist(data1$Clicks, main="", xlab="# of Clicks")
+hist(df_nytc$Clicks, main="", xlab="# of Clicks")
 
-range(data1$Clicks)
+range(df_nytc$Clicks)
 
-data1$Age_Group <- cut(data1$Age, c(-Inf, 18, 24, 34, 44, 54, 64, Inf))
+df_nytc$Age_Group <- cut(df_nytc$Age, c(-Inf, 18, 24, 34, 44, 54, 64, Inf))
 
-levels(data1$Age_Group) <- c("<18", "18-24", "25-34", "35-44", "45-54", "55-64", "65+")
+levels(df_nytc$Age_Group) <- c("<18", "18-24", "25-34", "35-44", "45-54", "55-64", "65+")
 # Name the levels of 'Age_Group' for readability
 
-d1 <- data1[(data1$Impressions > 0),]
+d1 <- df_nytc[(df_nytc$Impressions > 0),]
 d1$CTR <- d1$Clicks/d1$Impressions
 
 library(ggplot2) # used for visualizations
