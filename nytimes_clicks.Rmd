@@ -7,6 +7,10 @@ output: html_document
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+
+library(ggplot2) # used for visualizations
+library(plyr)
+
 ```
 
 ## NYTimes Click Thru Evaluation
@@ -57,15 +61,11 @@ levels(df_nytc$Age_Group) <- c("<18", "18-24", "25-34", "35-44", "45-54", "55-64
 d1 <- df_nytc[(df_nytc$Impressions > 0),]
 d1$CTR <- d1$Clicks/d1$Impressions
 
-library(ggplot2) # used for visualizations
+
 ggplot(subset(d1, Impressions>0), aes(x=Impressions, fill=Age_Group))+
     geom_histogram(binwidth=1)
 
-#Plot distributions of number impressions and click-through-rate (CTR = click/impression) for the age groups.
 
-ggplot(subset(d1, CTR>0), aes(x=CTR, fill=Age_Group))+
-    labs(title="Click-through rate by age group (05/01/2012)")+
-    geom_histogram(binwidth=.025)
 
 ```
 
@@ -85,12 +85,62 @@ dim(d1[d1$Signed_In == 1,])[1]
 
 # Get the mean of Age, Impressions, Clicks, CTR and percentage of males and signed_In 
 
+means_all <- sapply(d1, mean)
+
+
+mean(d1$Age)
+mean(d1$Impressions)
+mean(d1$Clicks)
+mean(d1$CTR)
+mean(mean(d1$Gender))
+mean(d1$Signed_In)
+
 #Get the means of Impressions, Clicks, CTR and percentage of males and signed_In  by AgeGroup.
+
+mean(d1$Impressions)
+mean(d1$Clicks)
+mean(d1$CTR)
+mean(mean(d1$Gender))
+mean(d1$Signed_In)
+
+list_levels <- levels(d1$Age_Group)
+means_list <- list()
+
+means_table <- data.frame(matrix(ncol = 6, nrow = 0))
+tbl_names <- c("Age_Group, "Age", "Impressions", "Clicks", "CTR", "Signed_In")
+colnames(means_table) <- tbl_names
+
+for (ll in 1:length(list_levels))
+{
+	df_subset <- d1[d1$Age_Group == list_levels[ll],]
+	df_sub_subset <- subset (df_subset, select = c(Age, Impressions, Clicks, CTR, Signed_In))
+	means_list <- sapply(df_sub_subset, mean)
+	
+	print(sprintf ("Age Group : %s | Means : ", list_levels[ll]))
+	print(sprintf("%8.3f", means_list))
+}
 
 #Create a table of CTRGroup vs AgeGroup counts.
 
+attach(d1)
+x_table <- count(d1, c("Age_Group","ctr_counts"))
+detach(d1)
+
+
 #Plot distributions of number impressions and click-through-rate (CTR = click/impression) for the age groups
+
+#Plot distributions of number impressions and click-through-rate (CTR = click/impression) for the age groups.
+
+ggplot(subset(d1, CTR>0), aes(x=CTR, fill=Age_Group))+
+    labs(title="Click-through rate by age group (05/01/2012)")+
+    geom_histogram(binwidth=.025)
+
+
 #One more plot you think which is important to look at.
+
+
+
+
 
 #Submit your file (any format) in to Live session Unit 10 Assignment
 
