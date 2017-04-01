@@ -41,10 +41,18 @@ hist(df_nytc$Clicks, main="", xlab="# of Clicks")
 
 range(df_nytc$Clicks)
 
+#Create a new variable ageGroup that categorizes age into following groups: 
+#< 18, 18–24, 25–34, 35–44, 45–54, 55–64 and 65+.
+
 df_nytc$Age_Group <- cut(df_nytc$Age, c(-Inf, 18, 24, 34, 44, 54, 64, Inf))
 
 levels(df_nytc$Age_Group) <- c("<18", "18-24", "25-34", "35-44", "45-54", "55-64", "65+")
 # Name the levels of 'Age_Group' for readability
+
+#Use sub set of data called “ImpSub” where Impressions > 0 ) in your data set.
+
+#Create a new variable called click-through-rate (CTR = click/impression).
+#Use this ImpSub data set to do further analysis.
 
 d1 <- df_nytc[(df_nytc$Impressions > 0),]
 d1$CTR <- d1$Clicks/d1$Impressions
@@ -53,26 +61,27 @@ library(ggplot2) # used for visualizations
 ggplot(subset(d1, Impressions>0), aes(x=Impressions, fill=Age_Group))+
     geom_histogram(binwidth=1)
 
+#Plot distributions of number impressions and click-through-rate (CTR = click/impression) for the age groups.
+
 ggplot(subset(d1, CTR>0), aes(x=CTR, fill=Age_Group))+
     labs(title="Click-through rate by age group (05/01/2012)")+
     geom_histogram(binwidth=.025)
 
-#(http://stat.columbia.edu/~rachel/datasets/nyt1.csv)
-#Create a new variable ageGroup that categorizes age into following groups: 
-#< 18, 18–24, 25–34, 35–44, 45–54, 55–64 and 65+.
+```
 
-#Use sub set of data called “ImpSub” where Impressions > 0 ) in your data set.
-
-#Create a new variable called click-through-rate (CTR = click/impression).
-#Use this ImpSub data set to do further analysis.
-
-#Plot distributions of number impressions and click-through-rate (CTR = click/impression) for the age groups.
 
 #Define a new variable to segment users based on click -through-rate (CTR) behavior.
 #    CTR< 0.2, 0.2<=CTR <0.4, 0.4<= CTR<0.6, 0.6<=CTR<0.8, CTR>0.8
 
+d1$ctr_counts <- cut(d1$CTR, c(-Inf, 0.2, 0.4, 0.6, 0.8, Inf))
+
 #Get the total number of Male, Impressions, Clicks and Signed_In
 #  (0=Female, 1=Male)
+
+dim(d1[d1$Gender == 1,])[1]
+dim(d1[d1$Impressions == 1,])[1]
+dim(d1[d1$Clicks == 1,])[1]
+dim(d1[d1$Signed_In == 1,])[1]
 
 # Get the mean of Age, Impressions, Clicks, CTR and percentage of males and signed_In 
 
