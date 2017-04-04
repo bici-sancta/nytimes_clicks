@@ -10,6 +10,8 @@ knitr::opts_chunk$set(echo = TRUE)
 
 library(ggplot2) # used for visualizations
 library(plyr)
+library(GGally)
+
 
 ```
   
@@ -55,8 +57,8 @@ if (file_exists)
 ```
 
 
-
-## __distribution of the Age column__  
+***  
+#### __distribution of the Age column__  
 
 ```{r}
 
@@ -66,7 +68,8 @@ hist(df_nytc[df_nytc$Age > 0,]$Age, main="Age Distribution - Remove 0s", xlab = 
 
 ```
 
-## __distribution and range of the Clicks column__  
+***  
+#### __distribution and range of the Clicks column__  
 
 ```{r}
 hist(df_nytc$Clicks, main="", xlab="# of Clicks")
@@ -74,9 +77,11 @@ hist(df_nytc$Clicks, main="", xlab="# of Clicks")
 range(df_nytc$Clicks)
 ```
 
+***  
 
-### __Create a new variable ageGroup that categorizes age into following groups:__   
-### __< 18, 18–24, 25–34, 35–44, 45–54, 55–64 and 65+.__  
+#### __Create a new variable ageGroup that categorizes age into following groups:__   
+#### * < 18, 18–24, 25–34, 35–44, 45–54, 55–64 and 65+.    
+##### * Name the levels of 'Age_Group' for readability  
 
 ```{r}
 
@@ -86,103 +91,124 @@ levels(df_nytc$Age_Group) <- c("<18", "18-24", "25-34", "35-44", "45-54", "55-64
 
 ```
 
-# Name the levels of 'Age_Group' for readability
 
-#Use sub set of data called “ImpSub” where Impressions > 0 ) in your data set.
-
-#Create a new variable called click-through-rate (CTR = click/impression).
-#Use this ImpSub data set to do further analysis.
+***  
+#### __Use sub set of data called “imp_sub” where Impressions > 0 in your data set.__  
+####	* Create a new variable called click-through-rate (clk_thru_rate = clicks / impression).  
+####	* Use this imp_sub data set to do further analysis.  
 
 ```{r}
-d1 <- df_nytc[(df_nytc$Impressions > 0),]
-d1$CTR <- d1$Clicks/d1$Impressions
 
-
-ggplot(subset(d1, Impressions>0), aes(x=Impressions, fill=Age_Group))+
-    geom_histogram(binwidth=1)
-
-
+df_imp_sub <- df_nytc[(df_nytc$Impressions > 0),]
+df_imp_sub$clk_thru_rate <- df_imp_sub$Clicks / df_imp_sub$Impressions
 
 ```
 
+***  
+#### __Plot distributions of number impressions for the age groups__  
 
-#Define a new variable to segment users based on click -through-rate (CTR) behavior.
-#    CTR< 0.2, 0.2<=CTR <0.4, 0.4<= CTR<0.6, 0.6<=CTR<0.8, CTR>0.8
+```{r}
+ggplot(subset(df_imp_sub, Impressions > 0), aes(x = Impressions, fill = Age_Group)) +
+	geom_histogram(binwidth = 1)
 
-d1$ctr_counts <- cut(d1$CTR, c(-Inf, 0.2, 0.4, 0.6, 0.8, Inf))
-
-#Get the total number of Male, Impressions, Clicks and Signed_In
-#  (0=Female, 1=Male)
-
-dim(d1[d1$Gender == 1,])[1]
-dim(d1[d1$Impressions == 1,])[1]
-dim(d1[d1$Clicks == 1,])[1]
-dim(d1[d1$Signed_In == 1,])[1]
-
-# Get the mean of Age, Impressions, Clicks, CTR and percentage of males and signed_In 
-
-means_all <- sapply(d1, mean)
+```
+***  
+#### __Plot distributions of click-through-rate (clk_thru_rate = click/impression) for the age groups__  
 
 
-mean(d1$Age)
-mean(d1$Impressions)
-mean(d1$Clicks)
-mean(d1$CTR)
-mean(mean(d1$Gender))
-mean(d1$Signed_In)
-
-#Get the means of Impressions, Clicks, CTR and percentage of males and signed_In  by AgeGroup.
-
-mean(d1$Impressions)
-mean(d1$Clicks)
-mean(d1$CTR)
-mean(mean(d1$Gender))
-mean(d1$Signed_In)
-
-list_levels <- levels(d1$Age_Group)
-means_list <- list()
-
-means_table <- data.frame(matrix(ncol = 6, nrow = 0))
-tbl_names <- c("Age_Group, "Age", "Impressions", "Clicks", "CTR", "Signed_In")
-colnames(means_table) <- tbl_names
-
-for (ll in 1:length(list_levels))
-{
-	df_subset <- d1[d1$Age_Group == list_levels[ll],]
-	df_sub_subset <- subset (df_subset, select = c(Age, Impressions, Clicks, CTR, Signed_In))
-	means_list <- sapply(df_sub_subset, mean)
-	
-	print(sprintf ("Age Group : %s | Means : ", list_levels[ll]))
-	print(sprintf("%8.3f", means_list))
-}
-
-#Create a table of CTRGroup vs AgeGroup counts.
-
-attach(d1)
-x_table <- count(d1, c("Age_Group","ctr_counts"))
-detach(d1)
-
-
-#Plot distributions of number impressions and click-through-rate (CTR = click/impression) for the age groups
-
-#Plot distributions of number impressions and click-through-rate (CTR = click/impression) for the age groups.
-
-ggplot(subset(d1, CTR>0), aes(x=CTR, fill=Age_Group))+
+```{r}
+ggplot(subset(df_imp_sub, clk_thru_rate > 0), aes(x = clk_thru_rate, fill = Age_Group))+
     labs(title="Click-through rate by age group (05/01/2012)")+
-    geom_histogram(binwidth=.025)
-
-
-#One more plot you think which is important to look at.
-
-
-
-
-
-#Submit your file (any format) in to Live session Unit 10 Assignment
-
+    geom_histogram(binwidth = .02)
 
 ```
+
+***  
+#### __Define a new variable to segment users based on click-through-rate behavior.__  
+####	* clk_thru_rate< 0.2, 0.2<=clk_thru_rate <0.4, 0.4<= clk_thru_rate<0.6, 0.6<=clk_thru_rate<0.8, clk_thru_rate>0.8
+
+```{r}
+
+df_imp_sub$clk_thru_rate_counts <- cut(df_imp_sub$clk_thru_rate, c(-Inf, 0.2, 0.4, 0.6, 0.8, Inf))
+
+```
+
+***  
+#### __Get the total number of Male, Impressions, Clicks and Signed_In__  
+####	* (0 = Female, 1 = Male)
+
+```{r}
+
+n_males <- dim(df_imp_sub[df_imp_sub$Gender == 1,])[1]
+n_imps <- dim(df_imp_sub[df_imp_sub$Impressions == 1,])[1]
+n_clicks <- dim(df_imp_sub[df_imp_sub$Clicks == 1,])[1]
+n_signed_in <- dim(df_imp_sub[df_imp_sub$Signed_In == 1,])[1]
+
+```
+
+```{r, cat block, echo = FALSE}
+
+cat ("Number of males       = ", n_males)
+cat ("Number of impressions = ", n_imps)
+cat ("Number of clicks      = ", n_clicks)
+cat ("Number of signed in   = ", n_signed_in)
+
+```
+
+***  
+#### __Get the mean of Age, Impressions, Clicks, clk_thru_rate and percentage of males and signed_In__  
+
+```{r}
+
+col_drops <- c("Age_Group", "clk_thru_rate_counts")
+df_imp_sub_tmp <- df_imp_sub[ , !(names(df_imp_sub) %in% col_drops)]
+
+means_all <- sapply(df_imp_sub_tmp, mean)
+
+means_all
+
+```
+
+***  
+#### Get the means of Impressions, Clicks, clk_thru_rate and percentage of males and signed_In __by AgeGroup.__  
+
+```{r}
+
+df_imp_sub <- df_imp_sub[c(1:5,7,6,8)]
+
+aggregate(df_imp_sub[, 1:6], list(df_imp_sub$Age_Group), mean)
+
+```
+
+***  
+#### __Create a table of clk_thru_rate Group vs Age Group counts.__  
+
+```{r}
+
+x_table <- ddply(df_imp_sub, .(df_imp_sub$clk_thru_rate_counts, df_imp_sub$Age_Group), nrow)
+names(x_table) <- c("Clk Thru Rate Group", "Age Group", "Freq")
+
+x_table
+
+```
+
+
+#### __One more plot you think which is important to look at.__  
+
+* this is based on plot explanation from :  
+	+ https://www.r-bloggers.com/example-9-17-much-better-pairs-plots/
+
+```{r}
+
+ggpairs(df_exp_plot,
+		columns = c("clk_thru_rate_counts", "Age_Group", "Gender"),
+	    diag = list(continuous = "density", discrete = "bar"), axisLabels = "show")
+
+```
+  
 
 ***   
-some more text  
+ ... end_of_file  
 ***  
+  
+  
