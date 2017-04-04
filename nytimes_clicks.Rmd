@@ -12,15 +12,35 @@ library(ggplot2) # used for visualizations
 library(plyr)
 
 ```
+  
+***  
 
-## NYTimes Click Thru Evaluation
+## NYTimes Click Thru Evaluation  
+  
+  
+* From the data sets at http://stat.columbia.edu/~rachel/datasets/ there are 31 data sets named nyt1.csv, nyt2.csv, ...  
+* Each set represents one simulated day's worth of ads shown and click recorded on New York Times home page in May 2012  
+* Each row represents one user  
+* Five columns represent :
+	+ age,
+	+ gender (0 = female, 1 = male),
+	+ number of impressions,  
+	+ number of clicks, and  
+	+ whether user logged in.  
+  
+  
+  
+***    
+#### Read in base data file  
 
-
-```{r }
+```{r read data file}
 
 home_dir <- "~/_smu/_src/nytimes_clicks"
 data_dir <- paste0(home_dir, "/data")
 setwd(home_dir)
+
+
+# ...	toggle file_exists TRUE/FALSE depending on if .Rda file already locally saved
 
 file_exists <- TRUE
 
@@ -32,25 +52,40 @@ if (file_exists)
 	df_nytc <- read.csv(url(fileLocation))
 	save(df_nytc, file = "./data/nytc.Rda")
 }
+```
 
-# Use the section below if you would rather import the data from a local file
-# fileLocation <- "~/path/for/the/file/nyt1.csv"
-# df_nytc <- read.csv("fileLocation")
 
-# distribution of the Age column
-hist(df_nytc$Age, main="", xlab="Age")
 
-# distribution of the Clicks column
+## __distribution of the Age column__  
+
+```{r}
+
+hist(df_nytc$Age, main="Age Distribution", xlab = "Age")
+
+hist(df_nytc[df_nytc$Age > 0,]$Age, main="Age Distribution - Remove 0s", xlab = "Age")
+
+```
+
+## __distribution and range of the Clicks column__  
+
+```{r}
 hist(df_nytc$Clicks, main="", xlab="# of Clicks")
 
 range(df_nytc$Clicks)
+```
 
-#Create a new variable ageGroup that categorizes age into following groups: 
-#< 18, 18–24, 25–34, 35–44, 45–54, 55–64 and 65+.
+
+### __Create a new variable ageGroup that categorizes age into following groups:__   
+### __< 18, 18–24, 25–34, 35–44, 45–54, 55–64 and 65+.__  
+
+```{r}
 
 df_nytc$Age_Group <- cut(df_nytc$Age, c(-Inf, 18, 24, 34, 44, 54, 64, Inf))
 
 levels(df_nytc$Age_Group) <- c("<18", "18-24", "25-34", "35-44", "45-54", "55-64", "65+")
+
+```
+
 # Name the levels of 'Age_Group' for readability
 
 #Use sub set of data called “ImpSub” where Impressions > 0 ) in your data set.
@@ -58,6 +93,7 @@ levels(df_nytc$Age_Group) <- c("<18", "18-24", "25-34", "35-44", "45-54", "55-64
 #Create a new variable called click-through-rate (CTR = click/impression).
 #Use this ImpSub data set to do further analysis.
 
+```{r}
 d1 <- df_nytc[(df_nytc$Impressions > 0),]
 d1$CTR <- d1$Clicks/d1$Impressions
 
@@ -146,3 +182,7 @@ ggplot(subset(d1, CTR>0), aes(x=CTR, fill=Age_Group))+
 
 
 ```
+
+***   
+some more text  
+***  
