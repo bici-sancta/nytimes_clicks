@@ -198,10 +198,10 @@ x_table
 * this is based on plot explanation from :  
 	+ https://www.r-bloggers.com/example-9-17-much-better-pairs-plots/
 
-```{r}
+```{r, warning = FALSE}
 
-ggpairs(df_exp_plot,
-		columns = c("clk_thru_rate_counts", "Age_Group", "Gender"),
+ggpairs(df_imp_sub,
+		columns = c("clk_thru_rate", "Age_Group", "Gender"),
 	    diag = list(continuous = "density", discrete = "bar"), axisLabels = "show")
 
 ```
